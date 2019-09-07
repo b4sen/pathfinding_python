@@ -1,5 +1,6 @@
 import sys
 import pygame
+from node import Node
 
 WIDTH = 600
 HEIGHT = 600
@@ -8,11 +9,12 @@ HEIGHT = 600
 # LEFT CLICK -> DRAW START NODE : 1
 # SHIFT CLICK -> DRAW END NODE : 2
 # CTRL CLICK -> DRAW WALL : 3
+# press SPACE to reset everything
 
 # Hit enter to start algorithm -> generate grid with Node objects (start, end, wall) from self.grid array
 
 
-class Display:
+class Pathfinder:
     def __init__(self, width, height):
         pygame.init()
         self.white = 255, 255, 255
@@ -25,12 +27,16 @@ class Display:
         self.rows = self.height // self.scl
         self.screen = pygame.display.set_mode((width, height))
         self.grid = [[0 for i in range(self.rows)] for i in range(self.cols)]
+        self.node_grid = [[0 for i in range(self.rows)] for i in range(self.cols)]
         self.colors = {
             1: (255, 0, 0),  # START NODE
             2: (0, 0, 255),  # END NODE
             3: (100, 100, 100),  # WALL
             4: (0, 255, 0)  # PATH
         }
+
+    def reset(self):
+        self.__init__(self.width, self.height)
 
     def draw_grid(self):
         black = 0, 0, 0
@@ -95,19 +101,30 @@ class Display:
     def get_cell(self, x, y):
         return self.grid[x][y]
 
+    # Fill the grid with Node objects
+    def create_nodes(self):
+        for c in range(self.cols):
+            for r in range(self.rows):
+                n = Node(r, c, self.grid[c][r])
+                self.node_grid[c][r] = n
+
     def run(self):
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.reset()
 
             self.screen.fill(self.white)
             self.draw_grid()
             self.set_nodes()
             self.draw_nodes()
+            self.create_nodes()
             pygame.display.flip()
 
 
 if __name__ == "__main__":
-    d = Display(WIDTH, HEIGHT)
+    d = Pathfinder(WIDTH, HEIGHT)
     d.run()
