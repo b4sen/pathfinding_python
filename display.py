@@ -99,5 +99,6 @@ class Display:
             pygame.display.flip()
 
 
-d = Display(WIDTH, HEIGHT)
-d.run()
+if __name__ == "__main__":
+    d = Display(WIDTH, HEIGHT)
+    d.run()
