@@ -1,13 +1,15 @@
 import sys
 import pygame
 
-
 WIDTH = 600
 HEIGHT = 600
+
 
 # LEFT CLICK -> DRAW START NODE : 1
 # SHIFT CLICK -> DRAW END NODE : 2
 # CTRL CLICK -> DRAW WALL : 3
+
+# Hit enter to start algorithm -> generate grid with Node objects (start, end, wall) from self.grid array
 
 
 class Display:
@@ -23,6 +25,12 @@ class Display:
         self.rows = self.height // self.scl
         self.screen = pygame.display.set_mode((width, height))
         self.grid = [[0 for i in range(self.rows)] for i in range(self.cols)]
+        self.colors = {
+            1: (255, 0, 0),  # START NODE
+            2: (0, 0, 255),  # END NODE
+            3: (100, 100, 100),  # WALL
+            4: (0, 255, 0)  # PATH
+        }
 
     def draw_grid(self):
         black = 0, 0, 0
@@ -36,49 +44,50 @@ class Display:
 
     def set_nodes(self):
         # DRAW WALL
-        if(pygame.key.get_pressed()[pygame.K_LSHIFT] & pygame.mouse.get_pressed()[0]):
+        if pygame.key.get_pressed()[pygame.K_LSHIFT] & pygame.mouse.get_pressed()[0]:
             x, y = pygame.mouse.get_pos()
             x = int(x // self.scl)
             y = int(y // self.scl)
-            if(self.get_cell(x, y) == 1):
+            if self.get_cell(x, y) == 1:
                 self.start_node = False
-            elif(self.get_cell(x, y) == 2):
+            elif self.get_cell(x, y) == 2:
                 self.end_node = False
             self.set_cell(x, y, 3)
         # DELETE WALL
-        elif(pygame.key.get_pressed()[pygame.K_LCTRL] & pygame.mouse.get_pressed()[0]):
+        elif pygame.key.get_pressed()[pygame.K_LCTRL] & pygame.mouse.get_pressed()[0]:
             x, y = pygame.mouse.get_pos()
             x = int(x // self.scl)
             y = int(y // self.scl)
-            if(self.get_cell(x, y) == 1):
+            if self.get_cell(x, y) == 1:
                 self.start_node = False
-            elif(self.get_cell(x, y) == 2):
+            elif self.get_cell(x, y) == 2:
                 self.end_node = False
             self.set_cell(x, y, 0)
         else:
             # TODO: check if start or end node already exists
-            if(pygame.mouse.get_pressed()[0] and self.start_node == False):
+            if pygame.mouse.get_pressed()[0] and self.start_node == False:
                 x, y = pygame.mouse.get_pos()
                 x = int(x // self.scl)
                 y = int(y // self.scl)
+                if self.get_cell(x, y) == 2:
+                    self.end_node = False
                 self.set_cell(x, y, 1)
                 self.start_node = True
-            elif(pygame.mouse.get_pressed()[2] and self.end_node == False):
+            elif pygame.mouse.get_pressed()[2] and self.end_node == False:
                 x, y = pygame.mouse.get_pos()
                 x = int(x // self.scl)
                 y = int(y // self.scl)
+                if self.get_cell(x, y) == 1:
+                    self.start_node = False
                 self.set_cell(x, y, 2)
                 self.end_node = True
 
     def draw_nodes(self):
         for c in range(self.cols):
             for r in range(self.rows):
-                if self.grid[c][r] == 1:
-                    pygame.draw.rect(self.screen, (255, 0, 0), (c * self.scl, r * self.scl, self.scl, self.scl))
-                if self.grid[c][r] == 2:
-                    pygame.draw.rect(self.screen, (0, 0, 255), (c * self.scl, r * self.scl, self.scl, self.scl))
-                if self.grid[c][r] == 3:
-                    pygame.draw.rect(self.screen, (100, 100, 100), (c * self.scl, r * self.scl, self.scl, self.scl))
+                if self.grid[c][r] in (1, 2, 3):
+                    pygame.draw.rect(self.screen, self.colors[self.get_cell(c, r)],
+                                     (c * self.scl, r * self.scl, self.scl, self.scl))
 
     def set_cell(self, x, y, val):
         self.grid[x][y] = val
