@@ -33,17 +33,32 @@ class Display:
             pygame.draw.line(self.screen, black, (0, var), (self.width, var), 1)
 
     def get_mouse(self):
-        if(pygame.mouse.get_pressed()[0]):
+        if(pygame.key.get_pressed()[pygame.K_LSHIFT] & pygame.mouse.get_pressed()[0]):
             x, y = pygame.mouse.get_pos()
             x = int(x // self.scl)
             y = int(y // self.scl)
-            self.set_cell(x, y, 1)
+            self.set_cell(x, y, 3)
+        else:
+            if(pygame.mouse.get_pressed()[0]):
+                x, y = pygame.mouse.get_pos()
+                x = int(x // self.scl)
+                y = int(y // self.scl)
+                self.set_cell(x, y, 1)
+            elif(pygame.mouse.get_pressed()[2]):
+                x, y = pygame.mouse.get_pos()
+                x = int(x // self.scl)
+                y = int(y // self.scl)
+                self.set_cell(x, y, 2)
 
-    def draw_begin(self):
+    def draw_nodes(self):
         for c in range(self.cols):
             for r in range(self.rows):
                 if self.grid[c][r] == 1:
                     pygame.draw.rect(self.screen, (255, 0, 0), (c * self.scl, r * self.scl, self.scl, self.scl))
+                if self.grid[c][r] == 2:
+                    pygame.draw.rect(self.screen, (0, 0, 255), (c * self.scl, r * self.scl, self.scl, self.scl))
+                if self.grid[c][r] == 3:
+                    pygame.draw.rect(self.screen, (100, 100, 100), (c * self.scl, r * self.scl, self.scl, self.scl))
 
     def set_cell(self, x, y, val):
         self.grid[x][y] = val
@@ -57,7 +72,7 @@ class Display:
             self.screen.fill(self.white)
             self.draw_grid()
             self.get_mouse()
-            self.draw_begin()
+            self.draw_nodes()
             pygame.display.flip()
 
 
