@@ -2,8 +2,8 @@ import sys
 import pygame
 from node import Node
 
-WIDTH = 100
-HEIGHT = 100
+WIDTH = 600
+HEIGHT = 600
 
 
 # LEFT CLICK -> DRAW START NODE : 1
@@ -42,6 +42,7 @@ class Pathfinder:
         self.end = None
         self.open_set = []
         self.closed_set = []
+        self.done = False
 
     def reset(self):
         self.__init__(self.width, self.height)
@@ -92,7 +93,7 @@ class Pathfinder:
                     self.end = None
                 self.set_cell(x, y, 1)
                 self.start_node = True
-                self.start = Node(x, y, 1)
+                self.start = self.node_grid[x][y]
                 self.open_set.append(self.node_grid[x][y])  # TEMPORARY SOLUTION FOR check_open(node)
                 # for node in self.node_grid:
                 #    for n in node:
@@ -107,7 +108,7 @@ class Pathfinder:
                     self.start = None
                 self.set_cell(x, y, 2)
                 self.end_node = True
-                self.end = Node(x, y, 2)
+                self.end = self.node_grid[x][y]
 
     def draw_nodes(self):
         for c in range(self.cols):
@@ -151,6 +152,7 @@ class Pathfinder:
         c, d = y
         return(((a - c)**2 + (b - d)**2)**0.5)
 
+    # the algorithm itself!
     def a_star(self):
         f = 0
         best = 0
@@ -161,9 +163,9 @@ class Pathfinder:
                     f = self.open_set[i].f
 
             current_node = self.open_set[best]
-            print(current_node.__str__())
-            if self.open_set[best].get_coords == self.end.get_coords():
+            if self.open_set[best].get_coords() == self.end.get_coords():
                 print("DONE!")
+                return
 
             del self.open_set[best]
             self.closed_set.append(current_node)
@@ -180,11 +182,11 @@ class Pathfinder:
                             node.g = temp_g
                     else:
                         node.g = temp_g
-                        node.val = 4
+                        if node.val != 2:
+                            node.val = 4
                         self.open_set.append(node)
                     node.h = self.calculate_distance(node.get_coords(), self.end.get_coords())
                     node.f = node.g + node.h
-                    print(node.h)
 
         else:
             pass
