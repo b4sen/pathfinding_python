@@ -20,6 +20,10 @@ class Node:
         self.h = 0
         self.neighbors = []
 
+    def __str__(self):
+        neighbors = [n.val for n in self.neighbors]
+        return self.x, self.y, self.val, neighbors
+
     def get_val(self):
         return self.val, self.x, self.y
 

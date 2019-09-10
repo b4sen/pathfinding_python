@@ -2,8 +2,8 @@ import sys
 import pygame
 from node import Node
 
-WIDTH = 600
-HEIGHT = 600
+WIDTH = 60
+HEIGHT = 60
 
 
 # LEFT CLICK -> DRAW START NODE : 1
@@ -31,14 +31,13 @@ class Pathfinder:
         self.cols = self.width // self.scl
         self.rows = self.height // self.scl
         self.screen = pygame.display.set_mode((width, height))
-        self.grid = [[0 for i in range(self.rows)] for i in range(self.cols)]
-        self.node_grid = [[0 for i in range(self.rows)] for i in range(self.cols)]
+        self.node_grid = [[Node(j, i, 0) for i in range(self.rows)] for j in range(self.cols)]
         self.start_node = False
         self.end_node = False
         self.start = None
         self.end = None
         self.open_set = []
-        self.came_from = []
+        self.closed_set = []
 
     def reset(self):
         self.__init__(self.width, self.height)
@@ -90,6 +89,10 @@ class Pathfinder:
                 self.set_cell(x, y, 1)
                 self.start_node = True
                 self.start = Node(x, y, 1)
+                # for node in self.node_grid:
+                #    for n in node:
+                #        print(n.__str__())
+
             elif pygame.mouse.get_pressed()[2] and not self.end_node:
                 x, y = pygame.mouse.get_pos()
                 x = int(x // self.scl)
@@ -104,15 +107,16 @@ class Pathfinder:
     def draw_nodes(self):
         for c in range(self.cols):
             for r in range(self.rows):
-                if self.grid[c][r] in (1, 2, 3):
+                if self.node_grid[c][r].val in (1, 2, 3):
                     pygame.draw.rect(self.screen, self.colors[self.get_cell(c, r)],
                                      (c * self.scl, r * self.scl, self.scl, self.scl))
 
     def set_cell(self, x, y, val):
-        self.grid[x][y] = val
+        #self.grid[x][y] = val
+        self.node_grid[x][y].val = val
 
     def get_cell(self, x, y):
-        return self.grid[x][y]
+        return self.node_grid[x][y].val
 
     # check if start node exists
     def check_open(self, node):
@@ -128,7 +132,7 @@ class Pathfinder:
     def create_node_grid(self):
         for c in range(self.cols):
             for r in range(self.rows):
-                n = Node(r, c, self.grid[c][r])
+                n = Node(r, c, 0)
                 self.node_grid[c][r] = n
                 self.check_open(n)
 
@@ -153,12 +157,25 @@ class Pathfinder:
                 print("DONE!")
 
             del self.open_set[best]
-            self.came_from.append(current_node)
+            self.closed_set.append(current_node)
+
+            neighbors = current_node.neighbors
+
+            for node in neighbors:
+                if node in self.closed_set:
+                    pass
+                else:
+                    temp_g = current_node.g + 1
+                    if node in self.open_set:
+                        if temp_g < node.g:
+                            node.g = temp_g
 
         else:
             pass
 
     def run(self):
+        self.create_node_grid()
+        self.add_neighbors()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -171,8 +188,6 @@ class Pathfinder:
             self.draw_grid()
             self.set_nodes()
             self.draw_nodes()
-            self.create_node_grid()
-            self.add_neighbors()
             pygame.display.flip()
 
 
