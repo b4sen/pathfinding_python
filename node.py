@@ -7,7 +7,8 @@ class Node:
         1: start
         2: end
         3: wall
-        4: path
+        4: visited
+        5: path
         0: empty
     """
 

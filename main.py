@@ -2,8 +2,8 @@ import sys
 import pygame
 from node import Node
 
-WIDTH = 60
-HEIGHT = 60
+WIDTH = 100
+HEIGHT = 100
 
 
 # LEFT CLICK -> DRAW START NODE : 1
@@ -14,12 +14,16 @@ HEIGHT = 60
 # Hit enter to start algorithm
 
 
+# TODO: check if start node is not overwritten,
+# if it is, remove the previous from the open_set and add the new one
+
+
 class Pathfinder:
     colors = {
         1: (255, 0, 0),  # START NODE
         2: (0, 0, 255),  # END NODE
         3: (100, 100, 100),  # WALL
-        4: (0, 255, 0)  # PATH
+        4: (0, 255, 0)  # VISITED
     }
 
     def __init__(self, width, height):
@@ -89,6 +93,7 @@ class Pathfinder:
                 self.set_cell(x, y, 1)
                 self.start_node = True
                 self.start = Node(x, y, 1)
+                self.open_set.append(self.node_grid[x][y])  # TEMPORARY SOLUTION FOR check_open(node)
                 # for node in self.node_grid:
                 #    for n in node:
                 #        print(n.__str__())
@@ -107,7 +112,7 @@ class Pathfinder:
     def draw_nodes(self):
         for c in range(self.cols):
             for r in range(self.rows):
-                if self.node_grid[c][r].val in (1, 2, 3):
+                if self.node_grid[c][r].val in (1, 2, 3, 4):
                     pygame.draw.rect(self.screen, self.colors[self.get_cell(c, r)],
                                      (c * self.scl, r * self.scl, self.scl, self.scl))
 
@@ -134,13 +139,17 @@ class Pathfinder:
             for r in range(self.rows):
                 n = Node(r, c, 0)
                 self.node_grid[c][r] = n
-                self.check_open(n)
 
     # Add the neighbors to each node
     def add_neighbors(self):
         for c in range(self.cols):
             for r in range(self.rows):
                 self.node_grid[c][r].add_neighbors(self.node_grid, self.cols, self.rows)
+
+    def calculate_distance(self, x, y):
+        a, b = x
+        c, d = y
+        return(((a - c)**2 + (b - d)**2)**0.5)
 
     def a_star(self):
         f = 0
@@ -152,7 +161,7 @@ class Pathfinder:
                     f = self.open_set[i].f
 
             current_node = self.open_set[best]
-
+            print(current_node.__str__())
             if self.open_set[best].get_coords == self.end.get_coords():
                 print("DONE!")
 
@@ -169,6 +178,13 @@ class Pathfinder:
                     if node in self.open_set:
                         if temp_g < node.g:
                             node.g = temp_g
+                    else:
+                        node.g = temp_g
+                        node.val = 4
+                        self.open_set.append(node)
+                    node.h = self.calculate_distance(node.get_coords(), self.end.get_coords())
+                    node.f = node.g + node.h
+                    print(node.h)
 
         else:
             pass
@@ -188,6 +204,8 @@ class Pathfinder:
             self.draw_grid()
             self.set_nodes()
             self.draw_nodes()
+            if self.start_node and self.end_node:
+                self.a_star()
             pygame.display.flip()
 
 
