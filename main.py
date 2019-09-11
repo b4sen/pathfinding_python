@@ -31,7 +31,7 @@ class Pathfinder:
     def __init__(self, width, height):
         pygame.init()
         self.white = 255, 255, 255
-        self.scl = 50
+        self.scl = 20
         self.width = width
         self.height = height
         self.cols = self.width // self.scl
@@ -49,6 +49,7 @@ class Pathfinder:
 
     def reset(self):
         self.__init__(self.width, self.height)
+        self.add_neighbors()
 
     def draw_grid(self):
         black = 0, 0, 0
