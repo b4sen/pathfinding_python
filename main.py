@@ -25,13 +25,13 @@ class Pathfinder:
         2: (0, 0, 255),  # END NODE
         3: (100, 100, 100),  # WALL
         4: (0, 255, 0),  # VISITED
-        5: (0, 255, 255)
+        5: (0, 255, 255)  # PATH
     }
 
     def __init__(self, width, height):
         pygame.init()
         self.white = 255, 255, 255
-        self.scl = 20
+        self.scl = 50
         self.width = width
         self.height = height
         self.cols = self.width // self.scl
@@ -149,25 +149,22 @@ class Pathfinder:
     # the algorithm itself!
     # TODO: fix the bug!! it's not working
     def a_star(self):
-        f = 0
         best = self.open_set[0]
         if len(self.open_set) > 0:
             for node in self.open_set:
                 if best.f > node.f:
                     best = node
-                    f = node.f
 
             current_node = best
             # Find the path
             if current_node.get_coords() == self.end.get_coords():
                 temp_node = current_node
-                while temp_node.came_from is not None:
+                while temp_node.came_from is not self.start:
                     self.path.append(temp_node.came_from)
                     temp_node = temp_node.came_from
                 for n in self.path:
                     n.val = 5
                 # print("DONE!")
-                print(f)
                 return
 
             self.open_set.remove(best)
