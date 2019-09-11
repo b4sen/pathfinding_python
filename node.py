@@ -20,6 +20,7 @@ class Node:
         self.g = 0
         self.h = 0
         self.neighbors = []
+        self.came_from = None
 
     def __str__(self):
         neighbors = [n.val for n in self.neighbors]
