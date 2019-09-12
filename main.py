@@ -74,6 +74,7 @@ class Pathfinder:
                 self.end_node = False
                 self.end = None
             self.set_cell(x, y, 3)
+            self.set_wall(x, y, True)
         # DELETE WALL
         elif pygame.key.get_pressed()[pygame.K_LCTRL] & pygame.mouse.get_pressed()[0]:
             x, y = pygame.mouse.get_pos()
@@ -86,6 +87,7 @@ class Pathfinder:
                 self.end_node = False
                 self.end = None
             self.set_cell(x, y, 0)
+            self.set_wall(x, y, False)
         else:
             # TODO: check if start or end node already exists
             if pygame.mouse.get_pressed()[0] and not self.start_node:
@@ -96,6 +98,7 @@ class Pathfinder:
                     self.end_node = False
                     self.end = None
                 self.set_cell(x, y, 1)
+                self.set_wall(x, y, False)
                 self.start_node = True
                 self.start = self.node_grid[x][y]
                 self.open_set.append(self.node_grid[x][y])  # TEMPORARY SOLUTION FOR check_open(node)
@@ -111,6 +114,7 @@ class Pathfinder:
                     self.start_node = False
                     self.start = None
                 self.set_cell(x, y, 2)
+                self.set_wall(x, y, False)
                 self.end_node = True
                 self.end = self.node_grid[x][y]
 
@@ -124,6 +128,9 @@ class Pathfinder:
     def set_cell(self, x, y, val):
         #self.grid[x][y] = val
         self.node_grid[x][y].val = val
+
+    def set_wall(self, x, y, is_wall):
+        self.node_grid[x][y].is_wall = is_wall
 
     def get_cell(self, x, y):
         return self.node_grid[x][y].val
@@ -174,9 +181,7 @@ class Pathfinder:
             neighbors = current_node.neighbors
 
             for node in neighbors:
-                if node in self.closed_set:
-                    pass
-                else:
+                if node not in self.closed_set and not node.is_wall:
                     temp_g = current_node.g + 1
                     if node in self.open_set:
                         if temp_g < node.g:
@@ -189,6 +194,8 @@ class Pathfinder:
                     node.h = self.calculate_distance(node.get_coords(), self.end.get_coords())
                     node.f = node.g + node.h
                     node.came_from = current_node
+                else:
+                    pass
 
         else:
             pass

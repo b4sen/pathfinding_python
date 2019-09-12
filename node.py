@@ -21,6 +21,7 @@ class Node:
         self.h = 0
         self.neighbors = []
         self.came_from = None
+        self.is_wall = False
 
     def __str__(self):
         neighbors = [n.val for n in self.neighbors]
