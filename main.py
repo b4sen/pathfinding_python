@@ -37,7 +37,8 @@ class Pathfinder:
         self.cols = self.width // self.scl
         self.rows = self.height // self.scl
         self.screen = pygame.display.set_mode((width, height))
-        self.node_grid = [[Node(j, i, 0) for i in range(self.rows)] for j in range(self.cols)]
+        self.node_grid = [[Node(j, i, 0) for i in range(self.rows)]
+                          for j in range(self.cols)]
         self.start_node = False
         self.end_node = False
         self.start = None
@@ -55,11 +56,13 @@ class Pathfinder:
         black = 0, 0, 0
         for col in range(self.cols):
             var = (col * self.scl) - 1
-            pygame.draw.line(self.screen, black, (var, 0), (var, self.height), 1)
+            pygame.draw.line(self.screen, black, (var, 0),
+                             (var, self.height), 1)
 
         for row in range(self.rows):
             var = (row * self.scl) - 1
-            pygame.draw.line(self.screen, black, (0, var), (self.width, var), 1)
+            pygame.draw.line(self.screen, black, (0, var),
+                             (self.width, var), 1)
 
     def set_nodes(self):
         # DRAW WALL
@@ -101,7 +104,8 @@ class Pathfinder:
                 self.set_wall(x, y, False)
                 self.start_node = True
                 self.start = self.node_grid[x][y]
-                self.open_set.append(self.node_grid[x][y])  # TEMPORARY SOLUTION FOR check_open(node)
+                # TEMPORARY SOLUTION FOR check_open(node)
+                self.open_set.append(self.node_grid[x][y])
                 # for node in self.node_grid:
                 #    for n in node:
                 #        print(n.__str__())
@@ -123,7 +127,7 @@ class Pathfinder:
             for r in range(self.rows):
                 if self.node_grid[c][r].val in self.colors:
                     pygame.draw.rect(self.screen, self.colors[self.get_cell(c, r)],
-                                     (c * self.scl, r * self.scl, self.scl, self.scl))
+                                     (c * self.scl, r * self.scl, self.scl - 1, self.scl - 1))
 
     def set_cell(self, x, y, val):
         #self.grid[x][y] = val
@@ -149,7 +153,8 @@ class Pathfinder:
     def add_neighbors(self):
         for c in range(self.cols):
             for r in range(self.rows):
-                self.node_grid[c][r].add_neighbors(self.node_grid, self.cols, self.rows)
+                self.node_grid[c][r].add_neighbors(
+                    self.node_grid, self.cols, self.rows)
 
     def calculate_distance(self, x, y):
         return(math.sqrt(((x[0] - y[0])**2) + ((x[1] - y[1])**2)))
@@ -191,7 +196,8 @@ class Pathfinder:
                         if node.val != 2:
                             node.val = 4
                         self.open_set.append(node)
-                    node.h = self.calculate_distance(node.get_coords(), self.end.get_coords())
+                    node.h = self.calculate_distance(
+                        node.get_coords(), self.end.get_coords())
                     node.f = node.g + node.h
                     node.came_from = current_node
                 else:
