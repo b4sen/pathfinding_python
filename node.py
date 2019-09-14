@@ -25,7 +25,7 @@ class Node:
 
     def __str__(self):
         neighbors = [n.val for n in self.neighbors]
-        return self.x, self.y, self.val, neighbors
+        return "%s %s %s %s" % (self.x, self.y, self.val, neighbors)
 
     def get_val(self):
         return self.val, self.x, self.y
@@ -38,8 +38,16 @@ class Node:
         y = self.y
         if x < cols - 1:
             self.neighbors.append(grid[x + 1][y])
+            if y < rows - 1:
+                self.neighbors.append(grid[x + 1][y + 1])
+            if y > 0:
+                self.neighbors.append(grid[x + 1][y - 1])
         if x > 0:
             self.neighbors.append(grid[x - 1][y])
+            if y < rows - 1:
+                self.neighbors.append(grid[x - 1][y + 1])
+            if y > 0:
+                self.neighbors.append(grid[x - 1][y - 1])
         if y < rows - 1:
             self.neighbors.append(grid[x][y + 1])
         if y > 0:

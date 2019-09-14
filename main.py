@@ -6,13 +6,14 @@ import math
 WIDTH = 600
 HEIGHT = 600
 
-
+README = """
 # LEFT CLICK -> DRAW START NODE : 1
-# SHIFT CLICK -> DRAW END NODE : 2
-# CTRL CLICK -> DRAW WALL : 3
+# RIGHT CLICK -> DRAW END NODE : 2
+# SHIFT CLICK -> DRAW WALL : 3
+# CTRL CLICK -> DELETE
 # press SPACE to reset everything
-
-# Hit enter to start algorithm
+"""
+# Set start and end nodes to start the algorithm
 
 
 # TODO: check if start node is not overwritten,
@@ -20,6 +21,7 @@ HEIGHT = 600
 
 
 class Pathfinder:
+
     colors = {
         1: (255, 0, 0),  # START NODE
         2: (0, 0, 255),  # END NODE
@@ -28,8 +30,9 @@ class Pathfinder:
         5: (0, 255, 255)  # PATH
     }
 
+    pygame.init()
+
     def __init__(self, width, height):
-        pygame.init()
         self.white = 255, 255, 255
         self.scl = 20
         self.width = width
@@ -160,7 +163,6 @@ class Pathfinder:
         return(math.sqrt(((x[0] - y[0])**2) + ((x[1] - y[1])**2)))
 
     # the algorithm itself!
-    # TODO: fix the bug!! it's not working
     def a_star(self):
         best = self.open_set[0]
         if len(self.open_set) > 0:
@@ -188,18 +190,22 @@ class Pathfinder:
             for node in neighbors:
                 if node not in self.closed_set and not node.is_wall:
                     temp_g = current_node.g + 1
+                    new_path = False
                     if node in self.open_set:
                         if temp_g < node.g:
                             node.g = temp_g
+                            new_path = True
                     else:
                         node.g = temp_g
                         if node.val != 2:
                             node.val = 4
                         self.open_set.append(node)
-                    node.h = self.calculate_distance(
-                        node.get_coords(), self.end.get_coords())
-                    node.f = node.g + node.h
-                    node.came_from = current_node
+                        new_path = True
+                    if new_path:
+                        node.h = self.calculate_distance(
+                            node.get_coords(), self.end.get_coords())
+                        node.f = node.g + node.h
+                        node.came_from = current_node
                 else:
                     pass
 
